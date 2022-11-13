@@ -1,7 +1,8 @@
 # Python
 import json
 from uuid import UUID
-from datetime import date, datetime
+from datetime import date
+from datetime import datetime
 from typing import Optional, List
 
 #Pydantic
@@ -22,15 +23,14 @@ class UserBase(BaseModel):
     user_id: UUID = Field(...)
     email: EmailStr = Field(...)
 
-class UserLogin(BaseModel):
+class UserLogin(UserBase):
     password: str = Field(
         ...,
         min_length=8,
         max_length=64
         )
 
-class User(BaseModel):
-    
+class User(UserBase):
     first_name: str = Field(
         ...,
         min_length=1,
@@ -41,7 +41,7 @@ class User(BaseModel):
         min_length=1,
         max_length=50
         )
-    birth_date: Optional[date]
+    birth_date: Optional[date] = Field(default=None)
 
 class UserRegister(User):
     password: str = Field(
@@ -88,16 +88,22 @@ def signup(user: UserRegister = Body(...)):
     This path operation register a user in the app
 
     Parameters:
+
         - Request body parameter
+
             - user: UserRegister
 
     Returns a json with the basic user information:
+
         - user_id: UUID
+
         - email: Emailstr
+
         - first_name: str
+
         - last_name: str
+
         - birth_date: datetime
-    
     """
     with open("users.json", "r+", encoding="utf-8") as f:
         results = json.loads(f.read())
